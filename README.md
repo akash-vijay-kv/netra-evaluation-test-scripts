@@ -16,7 +16,12 @@ The test scripts mimics the behavior of a library assistant agent that can perfo
 pip install -r requirements.txt
 ```
 
-2. Create a .env file in the root directory and add the secrets as mentioned in the .env.example file:
+2. Install Netra SDK:
+```bash
+pip install <path-to-netra-sdk-local-repo>
+```
+
+3. Create a .env file in the root directory and add the secrets as mentioned in the .env.example file:
 
 
 ## Usage
