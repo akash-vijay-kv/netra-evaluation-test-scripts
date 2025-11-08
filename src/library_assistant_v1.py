@@ -151,7 +151,7 @@ async def get_library_agent_response(query: str) -> str:
     session_id = str(uuid.uuid4())
     Netra.set_session_id(session_id)
     Netra.set_tenant_id("NextGen Software Corp.")
-    Netra.set_user_id("Librarian")
+    Netra.set_user_id("Joseph Alex")
     return await ask_library_agent(query)
 
 
