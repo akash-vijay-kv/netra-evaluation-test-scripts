@@ -1,78 +1,85 @@
 import asyncio
 import os
-from netra import EvaluationScore, Netra
+from netra import Netra
+from netra.evaluation import DatasetItem
 from dotenv import load_dotenv
 load_dotenv()
 
 
 async def main():
-    
-    # V1 Agent Test Run
-    from library_assistant_v1 import get_library_agent_response
+    headers = f"x-api-key={os.getenv('NETRA_API_KEY')}"
+    Netra.init(app_name="test", headers=headers, debug_mode=True)
 
-    dataset = Netra.evaluation.get_dataset(dataset_id="8900c125-c1a7-4f54-a68c-3e621269f7e3")
+    # response = Netra.evaluation.create_dataset(
+    #     name="test-v5-create-dataset",
+    #     tags=["tag-1", "test-tag-2"]
+    # )
+    # print(response)
+
+    # item1 = DatasetItem(
+    #     input="Test Query 4 for evaluation - who is the current Prime Minister of India?",
+    #     expected_output="The current Prime Minister of India is Narendra Modi"
+    # )
+
+    # item2 = DatasetItem(
+    #     input={
+    #         "question": "What is 2+2?",
+    #         "context": "Math problem"
+    #     },
+    #     expected_output={
+    #         "answer": "4",
+    #         "confidence": 0.95
+    #     }
+    # )
+
+    # response = Netra.evaluation.add_dataset_item(dataset_id="df735a66-e849-457f-9dc6-6b1f122ae574", item=item1)
+    # print(response)
+
+    # response = Netra.evaluation.get_dataset(dataset_id="8e069cec-3443-402e-99e5-c920357a9318")
+    # print(response)
+
+    from netra.evaluation import BaseEvaluator, EvaluatorConfig, EvaluatorOutput, ScoreType
+
+    class MyEvaluator(BaseEvaluator):
+        def evaluate(self, context):
+
+            return EvaluatorOutput(
+                evaluator_name="my_evaluator",
+                result=1,
+                is_passed=True,
+                reason="Match",
+            )
+
+    from copywriting_assistant import get_copywriting_agent_response
+
+    dataset = Netra.evaluation.get_dataset(
+        dataset_id="0f256725-177a-48d1-a7f3-a79643f98bd8")
 
     result = Netra.evaluation.run_test_suite(
-        name="Library Assistant v1",
+        name="Copywriting Assistant v1",
         data=dataset,
-        task=get_library_agent_response,
+        task=get_copywriting_agent_response,
+        evaluators=[
+            MyEvaluator(
+                EvaluatorConfig(
+                    name="my_evaluator",
+                    label="My Custom Evaluator",
+                    score_type=ScoreType.NUMERICAL,
+                )
+            )
+        ]
     )
 
-    # V2 Agent Test Run17598458-62c4-46a4-bae7-eec3d0bca1c6
-    # def accuracy_evaluator(input, output, expected_output):
-    #     if expected_output == output:
-    #         return EvaluationScore(metric_type="accuracy", score=1)
- 
-    #     return EvaluationScore(metric_type="accuracy", score=0)
 
-
-    # from library_assistant_v2 import get_library_agent_response
-
-    # dataset = Netra.evaluation.get_dataset(dataset_id="8900c125-c1a7-4f54-a68c-3e621269f7e3")
+    # dataset = Netra.evaluation.get_dataset(
+    #     dataset_id="0f256725-177a-48d1-a7f3-a79643f98bd8")
 
     # result = Netra.evaluation.run_test_suite(
-    #     name="Library Assistant v2",
+    #     name="Copywriting Assistant v1",
     #     data=dataset,
-    #     task=get_library_agent_response,
-    #     evaluators=[accuracy_evaluator],
+    #     task=get_copywriting_agent_response,
     # )
 
 
-    # V3 Dataset Entry via SDK
-    # from netra.evaluation import DatasetEntry
-    # from netra import Netra
-    
-    # from dotenv import load_dotenv
-
-    # headers = f"x-api-key={os.environ['NETRA_API_KEY']}"
-
-    # Netra.init(
-    #     app_name="openai-eval-feature",
-    #     disable_batch=True,
-    #     environment="dev",
-    #     headers=headers,
-    # )
-
-
-    # local_dataset = [
-    #     DatasetEntry(
-    #         input="What books are on my shelf?", 
-    #         expected_output={"output":"You have the following books on your shelf: \n\n1. Dune by Frank Herbert - $14.99 (Available) \n2. The Pragmatic Programmer by Andrew Hunt, David Thomas - $39.99 (Available) \n3. Clean Code by Robert C. Martin - $34.95 (Not Available)"}, 
-    #         tags=["library, books"]),
-    #     DatasetEntry(
-    #         input="What is the price of book 1?", 
-    #         expected_output={"output":"The price of book 1 is $14.99"}, 
-    #         tags=["library, books"]),
-    #     DatasetEntry(
-    #         input="Order 2 copies of Dune by Frank Herbert", 
-    #         expected_output={"output":"2 copies of Dune by Frank Herbert have been ordered."}, 
-    #         tags=["library, books"]),
-    # ]
-
-    # dataset_id = Netra.evaluation.create_dataset(name="Test-Dataset")
-    # for entry in local_dataset:
-    #     Netra.evaluation.add_dataset_entry(dataset_id=dataset_id, item=entry)
-
-    
 if __name__ == "__main__":
     asyncio.run(main())
