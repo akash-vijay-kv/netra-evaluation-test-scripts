@@ -6,7 +6,7 @@ import asyncio
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from netra import Netra, ConversationType
+from netra import Netra, ConversationType, SpanType
 from netra.decorators import agent, task, span
 from netra.instrumentation.instruments import InstrumentSet
 
@@ -20,7 +20,8 @@ Netra.init(
     environment="dev",
     headers=headers,
     instruments={InstrumentSet.OPENAI},
-    debug_mode=True
+    debug_mode=True,
+    # enable_root_span=True
 )
 
 
@@ -73,11 +74,10 @@ def generate_copywrite(user_query: str, model: Optional[str] = None) -> str:
     model_name = model or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
     system_prompt = (
-            "You are an expert copywriting assistant with deep knowledge of persuasive writing, marketing psychology, and brand communication."
-            "Your role is to help users create compelling, conversion-focused copy across all formats and channels."
-            "Generate fun and engaging copy. Make the content engaging and easy to understand."
-        )
-
+        "You are an expert copywriting assistant with deep knowledge of persuasive writing, marketing psychology, and brand communication."
+        "Your role is to help users create compelling, conversion-focused copy across all formats and channels."
+        "Generate fun and engaging copy. Make the content engaging and easy to understand."
+    )
 
     messages = [
         {"role": "system", "content": system_prompt},
@@ -109,6 +109,7 @@ def generate_copywrite(user_query: str, model: Optional[str] = None) -> str:
     )
 
     return content
+
 
 @span
 def refactoring_service(text: str, model: Optional[str] = None) -> str:
@@ -155,9 +156,11 @@ async def ask_copywriting_agent(query: str, model: Optional[str] = None) -> str:
         return content
 
 
+
 async def get_copywriting_agent_response(
     query: str, model: Optional[str] = None
 ) -> str:
+
     if isinstance(query, dict):
         query = query.get("question")
 
@@ -170,4 +173,5 @@ async def get_copywriting_agent_response(
 
 
 if __name__ == "__main__":
-    asyncio.run(get_copywriting_agent_response(query="Write an interesting blurb about our healthy chopsticks."))
+    asyncio.run(get_copywriting_agent_response(
+        query="Write an interesting blurb about our healthy chopsticks."))
