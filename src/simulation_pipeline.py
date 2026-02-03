@@ -7,6 +7,7 @@ load_dotenv()
 
 async def main():
 
+
     headers = f"x-api-key={os.getenv('NETRA_API_KEY')}"
     Netra.init(app_name="Simulation Pipeline", headers=headers, debug_mode=True)
 
@@ -14,17 +15,33 @@ async def main():
     Simulation Based Evaluation
     --------------------------------------------------
     """
-    
-    # from milestone_agent_wrapper import call_customer_service_api
-    from customer_service_agent import call_customer_service_bot
 
-    result = Netra.simulation.run_simulation(
-        name="Customer Service Agent v1",
-        dataset_id="e62d0a9f-018e-4790-9fc9-16107f7b489a",
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    # 1. Milestone Agent
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+    from milestone_agent_wrapper import MilestoneAgent
+
+    Netra.simulation.run_simulation(
+        name="Milestone Agent v1",
+        dataset_id="06f94894-0a1f-4062-a978-a739866f9b16",
         context={"Metadata": "Customer Support"},
-        task=call_customer_service_bot,
+        task=MilestoneAgent(),
     )
 
+
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    # 2. Customer Service Agent (Refund)
+    """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+    # from customer_service_agent import CustomerServiceBot
+
+    # Netra.simulation.run_simulation(
+    #     name="Customer Service Agent (Refund) v1",
+    #     dataset_id="06f94894-0a1f-4062-a978-a739866f9b16",
+    #     context={"Metadata": "Customer Support"},
+    #     task=CustomerServiceBot(),
+    # )
 
 
 if __name__ == "__main__":

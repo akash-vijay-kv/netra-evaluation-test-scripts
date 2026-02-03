@@ -1,3 +1,4 @@
+from netra.simulation import BaseTask
 from netra import Netra
 import json
 import os
@@ -223,6 +224,15 @@ def call_customer_service_bot(
     agent = get_agent()
     result = agent.invoke(message, session_id)
     return TaskResult(session_id=result.get("session_id"), message=result.get("message"))
+
+
+class CustomerServiceBot(BaseTask):
+    def __init__(self):
+        super().__init__()
+
+    async def run(self, message: str, session_id: Optional[str] = None):
+        result = call_customer_service_bot(message, session_id)
+        return TaskResult(session_id=result.session_id, message=result.message)
 
 
 def main():

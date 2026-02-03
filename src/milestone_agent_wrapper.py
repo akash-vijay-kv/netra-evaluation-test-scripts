@@ -378,6 +378,16 @@ def call_customer_service_api(
             message=response.message or ""
         )
 
+from netra.simulation import BaseTask
+
+class MilestoneAgent(BaseTask):
+    def __init__(self):
+        super().__init__()
+
+    async def run(self, message: str, session_id: Optional[str] = None):
+        result = call_customer_service_api(message, session_id)
+        return TaskResult(session_id=result.session_id, message=result.message)
+
 
 def main():
     """Example usage of the customer service API client."""
