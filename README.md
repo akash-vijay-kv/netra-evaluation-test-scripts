@@ -3,10 +3,7 @@
 This repository contains test scripts for Netra Evaluation. 
 
 
-The test scripts mimics the behavior of a library assistant agent that can perform the following tasks:
-- Fetch current shelf books
-- Get book info
-- Place orders
+The repository includes a simulation-based evaluation entrypoint in `src/simulation_pipeline.py` that runs Netra simulations against a configured dataset.
 
 
 ## Setup
@@ -21,39 +18,25 @@ pip install -r requirements.txt
 pip install <path-to-netra-sdk-local-repo>
 ```
 
-3. Create a .env file in the root directory and add the secrets as mentioned in the .env.example file:
+3. Create a `.env` file in the root directory and add the secrets as mentioned in `.env.example`.
+
+   Required by `src/simulation_pipeline.py`:
+   - `NETRA_API_KEY`
 
 
 ## Usage
 
-Run the library_assistant_v1 with the following queries to generate sample dataset items:
+### Run simulation-based evaluation
 
-1. What all books are in my shelf?
-
-```bash
-python3 src/library_assistant_v1.py --query "What all books are in my shelf?" 
-```
-
-2. Get me details about The Pragmatic Programmer
+`src/simulation_pipeline.py` initializes Netra and runs a simulation against the dataset configured in the script.
 
 ```bash
-python3 src/library_assistant_v1.py --query "Get me details about The Pragmatic Programmer" 
+python3 src/simulation_pipeline.py
 ```
 
-3. What all books do I have on my shelf and can you order 2 copies of Dune?
+To switch which agent you are simulating, edit `src/simulation_pipeline.py`:
+- Uncomment the block for the agent you want (Milestone Agent / Customer Service Agent).
+- Or keep the default `ChatKitAgent` block enabled.
 
-```bash
-python3 src/library_assistant_v1.py --query "What all books do I have on my shelf and can you order 2 copies of Dune?" 
-```
+If you want to run against a different dataset, update the `dataset_id` argument in the enabled `Netra.simulation.run_simulation(...)` call.
 
-Once you have generated the sample traces using the above commands, add them to your dataset. Then add the respective dataset id to the evaluation_pipeline.py file and run the evaluation pipeline.
-
-```bash
-python3 src/evaluation_pipeline.py
-```
-
-By default, the evaluation pipeline will run the evaluation for the library assistant v1 agent. To run the evaluation for the library assistant v2 agent, uncomment the respective code block in the evaluation_pipeline.py file.
-
-Once the two evaluations are complete, you will be able to see that the library assistant v2 underperformed.
-
-Now feel free to experiment with the evaluation pipeline.
